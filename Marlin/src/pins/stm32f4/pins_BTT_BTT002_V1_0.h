@@ -108,16 +108,18 @@
 #endif
 
 //
-// SPI pins for TMC2130 stepper drivers
+// Software SPI pins for TMC2130 stepper drivers
 //
-#ifndef TMC_SPI_MOSI
-  #define TMC_SPI_MOSI                      PB15
-#endif
-#ifndef TMC_SPI_MISO
-  #define TMC_SPI_MISO                      PB14
-#endif
-#ifndef TMC_SPI_SCK
-  #define TMC_SPI_SCK                       PB13
+#if ENABLED(TMC_USE_SW_SPI)
+  #ifndef TMC_SW_MOSI
+    #define TMC_SW_MOSI                     PB15
+  #endif
+  #ifndef TMC_SW_MISO
+    #define TMC_SW_MISO                     PB14
+  #endif
+  #ifndef TMC_SW_SCK
+    #define TMC_SW_SCK                      PB13
+  #endif
 #endif
 
 #if HAS_TMC_UART
@@ -170,11 +172,11 @@
 #define HEATER_0_PIN                        PE6   // Heater0
 #define HEATER_BED_PIN                      PE5   // Hotbed
 
-#ifndef FAN0_PIN
+#ifndef FAN_PIN
   #ifdef MK3_FAN_PINS
-    #define FAN0_PIN                        PB8   // Fan1
+    #define FAN_PIN                         PB8   // Fan1
   #else
-    #define FAN0_PIN                        PB9   // Fan0
+    #define FAN_PIN                         PB9   // Fan0
   #endif
 #endif
 
@@ -248,7 +250,7 @@
     #define BTN_EN1                  EXP1_03_PIN
     #define BTN_EN2                  EXP1_05_PIN
 
-    #define LCD_PINS_EN              EXP1_08_PIN
+    #define LCD_PINS_ENABLE          EXP1_08_PIN
     #define LCD_PINS_D4              EXP1_06_PIN
 
   #elif ENABLED(MKS_MINI_12864)
@@ -265,7 +267,7 @@
     #define BTN_EN1                  EXP2_03_PIN
     #define BTN_EN2                  EXP2_05_PIN
 
-    #define LCD_PINS_EN              EXP1_03_PIN
+    #define LCD_PINS_ENABLE          EXP1_03_PIN
     #define LCD_PINS_D4              EXP1_05_PIN
 
     #if ENABLED(FYSETC_MINI_12864)

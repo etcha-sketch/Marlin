@@ -23,7 +23,6 @@
 
 /**
  * Formbot Raptor pin assignments
- * ATmega2560
  */
 
 #define REQUIRE_MEGA2560
@@ -129,8 +128,8 @@
 #define HEATER_1_PIN                           7
 #define HEATER_BED_PIN                         8
 
-#ifndef FAN0_PIN
-  #define FAN0_PIN                             9
+#ifndef FAN_PIN
+  #define FAN_PIN                              9
 #endif
 
 #ifndef FIL_RUNOUT_PIN
@@ -174,7 +173,7 @@
   #define SD_DETECT_PIN                       49
   #define KILL_PIN                            41
   #define LCD_PINS_RS                         16
-  #define LCD_PINS_EN                         17
+  #define LCD_PINS_ENABLE                     17
   #define LCD_PINS_D4                         23
   #define LCD_PINS_D5                         25
   #define LCD_PINS_D6                         27

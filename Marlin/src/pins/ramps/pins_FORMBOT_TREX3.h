@@ -22,8 +22,7 @@
 #pragma once
 
 /**
- * Formbot T-Rex 3 pin assignments
- * ATmega2560
+ * Formbot pin assignments
  */
 
 #define REQUIRE_MEGA2560
@@ -132,7 +131,7 @@
 #define HEATER_1_PIN                           7
 #define HEATER_BED_PIN                         8
 
-#define FAN0_PIN                               9
+#define FAN_PIN                                9
 #define FAN1_PIN                              12
 
 #define FIL_RUNOUT_PIN                        22
@@ -164,7 +163,7 @@
 //
 #if IS_RRD_SC
   #define LCD_PINS_RS                         16
-  #define LCD_PINS_EN                         17
+  #define LCD_PINS_ENABLE                     17
   #define LCD_PINS_D4                         23
   #define LCD_PINS_D5                         25
   #define LCD_PINS_D6                         27

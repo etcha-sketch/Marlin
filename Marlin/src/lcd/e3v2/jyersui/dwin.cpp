@@ -38,6 +38,7 @@
 #include "../../../module/planner.h"
 #include "../../../module/settings.h"
 #include "../../../libs/buzzer.h"
+#include "../../../inc/Conditionals_post.h"
 
 //#define DEBUG_OUT 1
 #include "../../../core/debug_out.h"
@@ -807,7 +808,7 @@ void CrealityDWINClass::Draw_SD_Item(uint8_t item, uint8_t row) {
   if (item == 0)
     Draw_Menu_Item(0, ICON_Back, card.flag.workDirIsRoot ? F("Back") : F(".."));
   else {
-    card.selectFileByIndexSorted(item - 1);
+    card.getfilename_sorted(SD_ORDER(item - 1, card.get_num_Files()));
     char * const filename = card.longest_filename();
     size_t max = MENU_CHAR_LIMIT;
     size_t pos = strlen(filename), len = pos;
@@ -831,7 +832,7 @@ void CrealityDWINClass::Draw_SD_List(bool removed/*=false*/) {
   scrollpos = 0;
   process = File;
   if (card.isMounted() && !removed) {
-    LOOP_L_N(i, _MIN(card.get_num_items() + 1, TROWS))
+    LOOP_L_N(i, _MIN(card.get_num_Files() + 1, TROWS))
       Draw_SD_Item(i, i);
   }
   else {
@@ -3861,7 +3862,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
               Draw_Menu_Item(row, ICON_Back, F("Cancel"));
             else {
               thermalManager.setTargetHotend(0, 0);
-              TERN_(HAS_FAN, thermalManager.set_fan_speed(0, 0));
+              thermalManager.set_fan_speed(0, 0);
               Redraw_Menu(false, true, true);
             }
             break;
@@ -4228,7 +4229,8 @@ void CrealityDWINClass::Value_Control() {
     if (funcpointer) funcpointer();
     return;
   }
-  LIMIT(tempvalue, valuemin * valueunit, valuemax * valueunit);
+  NOLESS(tempvalue, (valuemin * valueunit));
+  NOMORE(tempvalue, (valuemax * valueunit));
   Draw_Float(tempvalue / valueunit, selection - scrollpos, true, valueunit);
   DWIN_UpdateLCD();
   if (active_menu == Move && livemove) {
@@ -4270,7 +4272,8 @@ void CrealityDWINClass::Option_Control() {
     DWIN_UpdateLCD();
     return;
   }
-  LIMIT(tempvalue, valuemin, valuemax);
+  NOLESS(tempvalue, valuemin);
+  NOMORE(tempvalue, valuemax);
   Draw_Option(tempvalue, static_cast<const char * const *>(valuepointer), selection - scrollpos, true);
   DWIN_UpdateLCD();
 }
@@ -4281,7 +4284,7 @@ void CrealityDWINClass::File_Control() {
   EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
   if (encoder_diffState == ENCODER_DIFF_NO) {
     if (selection > 0) {
-      card.selectFileByIndexSorted(selection - 1);
+      card.getfilename_sorted(SD_ORDER(selection - 1, card.get_num_Files()));
       char * const filename = card.longest_filename();
       size_t len = strlen(filename);
       size_t pos = len;
@@ -4300,7 +4303,7 @@ void CrealityDWINClass::File_Control() {
     }
     return;
   }
-  if (encoder_diffState == ENCODER_DIFF_CW && selection < card.get_num_items()) {
+  if (encoder_diffState == ENCODER_DIFF_CW && selection < card.get_num_Files()) {
     DWIN_Draw_Rectangle(1, Color_Bg_Black, 0, MBASE(selection - scrollpos) - 18, 14, MBASE(selection - scrollpos) + 33);
     if (selection > 0) {
       DWIN_Draw_Rectangle(1, Color_Bg_Black, LBLX, MBASE(selection - scrollpos) - 14, 271, MBASE(selection - scrollpos) + 28);
@@ -4340,7 +4343,7 @@ void CrealityDWINClass::File_Control() {
       }
     }
     else {
-      card.selectFileByIndexSorted(selection - 1);
+      card.getfilename_sorted(SD_ORDER(selection - 1, card.get_num_Files()));
       if (card.flag.filenameIsDir) {
         card.cd(card.filename);
         Draw_SD_List();
@@ -4473,7 +4476,7 @@ void CrealityDWINClass::Popup_Control() {
         case ETemp:
           if (selection == 0) {
             thermalManager.setTargetHotend(EXTRUDE_MINTEMP, 0);
-            TERN_(HAS_FAN, thermalManager.set_fan_speed(0, MAX_FAN_SPEED));
+            thermalManager.set_fan_speed(0, MAX_FAN_SPEED);
             Draw_Menu(PreheatHotend);
           }
           else
@@ -4660,7 +4663,7 @@ void CrealityDWINClass::Start_Print(bool sd) {
     if (sd) {
       #if ENABLED(POWER_LOSS_RECOVERY)
         if (recovery.valid()) {
-          MediaFile *diveDir = nullptr;
+          SdFile *diveDir = nullptr;
           const char * const fname = card.diveToFile(true, diveDir, recovery.info.sd_filename);
           card.selectFileByName(fname);
         }
